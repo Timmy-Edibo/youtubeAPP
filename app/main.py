@@ -4,6 +4,7 @@ from isodate import parse_duration
 
 import requests
 import os
+import json
 
 app = FastAPI(prefix="/do_it_yourself", tags=["Do It Yourself"])
 
@@ -67,26 +68,34 @@ async def youtube(form: str = Body(...)):
     search_params = {"key": youtube_api_key, "q": form, "part": "snippet", "type": "video", "maxResults": 9}
     search_results = requests.get(search_url, params=search_params)
     
-    results = search_results.json()["items"]
-    video_ids = [result["id"]["videoId"] for result in results]
+    # results = search_results.json()["items"]
+    results = search_results.json()
+    result_item=results["items"]
+    print(results["items"])
+    with open("test.json", "a", encoding="utf8") as file:
+        json.dump(results, file, indent=4)
 
-    video_params = {"key": youtube_api_key, "id": ",".join(video_ids), "part": "snippet, contentDetails", "maxResults": 9}
-    video_results = requests.get(video_url, params=video_params)
 
-    r = video_results.json()["items"]
+    # video_ids = [result["id"]["videoId"] for result in results]
 
-    videos =[]
-    for result in r:
-        video_data = {
-            "id": result["id"],
-            "url": f"https://www.youtube.com/watch?v={result['id']}",
-            "thumbnail": result["snippet"]["thumbnails"]["high"]["url"],
-            "duration": parse_duration(result['contentDetails']['duration']).total_seconds() // 60 ,
-            "title": result["snippet"]["title"]
-        }
-        videos.append(video_data)
+    # video_params = {"key": youtube_api_key, "id": ",".join(video_ids), "part": "snippet, contentDetails", "maxResults": 9}
+    # video_results = requests.get(video_url, params=video_params)
+
+    # r = video_results.json()["items"]
+
+    # videos =[]
+    # for result in r:
+    #     video_data = {
+    #         "id": result["id"],
+    #         "url": f"https://www.youtube.com/watch?v={result['id']}",
+    #         "thumbnail": result["snippet"]["thumbnails"]["high"]["url"],
+    #         "duration": parse_duration(result['contentDetails']['duration']).total_seconds() // 60 ,
+    #         "title": result["snippet"]["title"]
+    #     }
+    #     videos.append(video_data)
     
-    return {"data": videos }
+
+    # return {"data": videos }
 
 
 from pydantic import BaseModel
