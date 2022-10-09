@@ -70,8 +70,9 @@ async def youtube(form: str = Body(...)):
     
     # results = search_results.json()["items"]
     results = search_results.json()
+    print(result_item["items"])
     result_item=results["items"]
-    print(results["items"])
+
     with open("test.json", "a", encoding="utf8") as file:
         json.dump(results, file, indent=4)
 
